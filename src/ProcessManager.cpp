@@ -70,10 +70,10 @@ namespace keyfrog {
         boost::recursive_mutex::scoped_lock lock(m_accessMutex);
 
         // Add this process
-        ProcId newProc = addProcess(pidStr);
+        ProcId newProc;
 
         // Invalid PID?
-        if( 0 == newProc ) {
+        if( !addProcess(pidStr, newProc) ) {
             return false;
         }
 
@@ -155,16 +155,17 @@ namespace keyfrog {
      *
      * Not thread safe, because it's private
      */
-    ProcId ProcessManager::addProcess(const string & pidStr) {
-        ProcId newProc;
+    bool ProcessManager::addProcess(const string & pidStr, ProcId & newProc) {
         try {
             int pid, ppid;
             // Will throw exception if pid string is not integer
             pid = boost::lexical_cast<int>(pidStr);
 
             // Vertex of given process already exists?
-            if(0 != m_pidToId.count(pid))
-                return m_pidToId[pid];
+            if(0 != m_pidToId.count(pid)) {
+                newProc = m_pidToId[pid];
+                return true;
+            }
 
             // Add pid to graph
             newProc = add_vertex(m_procTree);
@@ -180,9 +181,9 @@ namespace keyfrog {
             }
         } catch( const std::exception & ex ) {
             // FIXME
-            return 0;
+            return false;
         }
-        return newProc;
+        return true;
     }
 
     /**

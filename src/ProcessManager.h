@@ -81,7 +81,7 @@ namespace keyfrog {
             boost::recursive_mutex m_accessMutex;
 
             /// Adds process to tree without connecting to parent
-            proc::ProcId addProcess(const std::string & pidStr);
+            bool addProcess(const std::string & pidStr, proc::ProcId & newProc);
 
             /// Sets parent, name, etc. parameters 
             virtual bool setProcessProperties(const proc::ProcId & newProc) = 0;
