@@ -84,6 +84,12 @@ namespace keyfrog {
             return false;
         }
 
+        // For special pid 0 it is all done
+        // Don't add any edge connected to any parent
+        if( 0 == m_procTree[newProc].pid ) {
+            return true;
+        }
+
         pid_t ppid = m_procTree[newProc].ppid;
         // If parent does not exist in graph, add him first
         if(0 == m_pidToId.count(ppid))
