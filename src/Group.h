@@ -55,7 +55,7 @@ namespace keyfrog {
         }
 
         void addProcess( const std::string & proc ) {
-            m_terminalProcesses.push_back( proc );
+            m_processes.push_back( proc );
         }
 
         const std::list<std::string> & windowClasses() const { return m_windowClasses; }

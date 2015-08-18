@@ -151,7 +151,7 @@ namespace keyfrog {
                     }
                     const char * tmp = (const char *)cur_rule->children->content;
                     newGroup.addProcess(tmp);
-                    _dbg("new proc %s-T-%s%s%s", cboldRed, cboldGreen, tmp, creset);
+                    _dbg("new proc %s%s%s", cboldGreen, tmp, creset);
                 }
             }
             // XXX: should empty group be added?
