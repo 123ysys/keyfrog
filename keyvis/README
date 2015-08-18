@@ -1,0 +1,13 @@
+Before compiling, following jars should be placed in libs/ (and later in dist/lib/) directory:
+
+dom4j-1.6.1.jar
+itext-1.4.8.jar
+jaxen-1.1.jar
+jcommon-1.0.8.jar
+jfreechart-1.0.4.jar
+sqlitejdbc-v033-nested.jar
+AbsoluteLayout.jar
+
+AbsoluteLayout comes from NetBeans. You will need Ant and Java JDK to build KeyVis (JDK
+is in package openjdk-[67]-jdk on Ubuntu, better use v.7). The jars can be found in binary
+release of KeyVis (download the zip file from sf.net). KeyVis is a NetBeans project.

@@ -1,0 +1,61 @@
+<!-- vim:ft=xml
+
+Use following command to get CLASS name of an X11 application (i.e. GUI application, not a textual application running in terminal):
+
+$ xprop WM_CLASS | cut -d, -f
+
+-->
+<keyfrog>
+        <application-groups>
+                <!-- Development tools -->
+                <group id="100" name="Development tools">
+                        <rule type="windowClassName">kdevelop</rule>
+                        <!-- If you don't use gvim for development, you might want to move it to "Other editors" -->
+                        <rule type="windowClassName">gvim</rule>
+                        <rule type="windowClassName">eclipse</rule>
+                        <rule type="windowClassName">anjuta</rule>
+                        <rule type="terminalProcessName">vim</rule>
+                        <rule type="terminalProcessName">gdb</rule>
+                </group>
+                <!-- Browsers -->
+                <group id="200" name="Browsers">
+                        <rule type="windowClassName">firefox</rule>
+                        <rule type="windowClassName">chromium-browser</rule>
+                        <rule type="windowClassName">google-chrome</rule>
+                        <rule type="windowClassName">konqueror</rule>
+                        <rule type="windowClassName">gecko</rule>
+                        <rule type="windowClassName">firefox-bin</rule>
+                </group>
+                <!-- Communication -->
+                <group id="300" name="Communication">
+                        <rule type="terminalProcessName">weechat-curses</rule>
+                        <rule type="terminalProcessName">irssi</rule>
+                        <rule type="terminalProcessName">ekg2</rule>
+                        <rule type="terminalProcessName">ekg</rule>
+                        <rule type="windowClassName">psi</rule>
+                        <rule type="windowClassName">gaim</rule>
+                </group>
+                <!-- Document readers -->
+                <group id="400" name="Document readers">
+                        <rule type="windowClassName">xpdf</rule>
+                        <rule type="windowClassName">gv</rule>
+                </group>
+                <!-- Other editors -->
+                <group id="500" name="Other editors">
+                        <rule type="windowClassName">gedit</rule>
+                        <rule type="windowClassName">kwrite</rule>
+                </group>
+                <!-- Shells -->
+                <group id="4000" name="Shells">
+                        <rule type="terminalProcessName">mc</rule>
+                        <rule type="terminalProcessName">zsh</rule>
+                        <rule type="terminalProcessName">bash</rule>
+                        <rule type="terminalProcessName">csh</rule>
+                </group>
+        </application-groups>
+        <options>
+                <!-- Warning: not all options are yet recognized -->
+                <debug state="on" logfile="keyfrog.log" uselogfile="on" usestderr="on" />
+                <cluster size="900" />
+        </options>
+</keyfrog>

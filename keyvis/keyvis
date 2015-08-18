@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if ! which java >/dev/null; then
+	echo "Error: no java found"
+	exit 1
+fi
+
+if [ -f keyvis.jar ] ; then
+	java -jar keyvis.jar
+else
+	cd /opt/keyvis
+	java -jar keyvis.jar
+fi
