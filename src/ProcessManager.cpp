@@ -86,16 +86,16 @@ namespace keyfrog {
 
         // For special pid 0 it is all done
         // Don't add any edge connected to any parent
-        if( 0 == m_procTree[newProc].pid ) {
+        if( 0 == m_procTreeGraph[newProc].pid ) {
             return true;
         }
 
-        pid_t ppid = m_procTree[newProc].ppid;
+        pid_t ppid = m_procTreeGraph[newProc].ppid;
         // If parent does not exist in graph, add him first
-        if(0 == m_pidToId.count(ppid))
+        if(0 == m_pidToIdMap.count(ppid))
             addConnectProcess(ppid);
         // Add edge parent -> newProc
-        add_edge(m_pidToId[ppid], newProc, m_procTree);
+        add_edge(m_pidToIdMap[ppid], newProc, m_procTreeGraph);
         return true;
     }
 
@@ -107,26 +107,26 @@ namespace keyfrog {
         boost::recursive_mutex::scoped_lock lock(m_accessMutex);
 
         // Proc exists in map?
-        if(0 == m_pidToId.count(pid)) {
+        if(0 == m_pidToIdMap.count(pid)) {
             // XXX Don't add, just return?
             addConnectProcess(pid);
             return;
         }
 
         // XXX Check if they exists in graph?
-        ProcId procId = m_pidToId[ pid ];
-        ProcId parentId = m_pidToId[ m_procTree[ procId ].ppid ];
+        ProcId procId = m_pidToIdMap[ pid ];
+        ProcId parentId = m_pidToIdMap[ m_procTreeGraph[ procId ].ppid ];
 
-        string pidStr = m_procTree[ procId ].pidStr;
+        string pidStr = m_procTreeGraph[ procId ].pidStr;
 
         // Remove edge from parent
-        remove_edge(parentId, procId, m_procTree);
+        remove_edge(parentId, procId, m_procTreeGraph);
 
         // Recursive for all children
         ProcDescIter eit, eit_end;
-        for(tie(eit, eit_end) = out_edges(procId, m_procTree); eit != eit_end; ++eit) {
-            ProcId targetProcId = target(*eit, m_procTree);
-            updateProcess( m_procTree[ targetProcId ].pid );
+        for(tie(eit, eit_end) = out_edges(procId, m_procTreeGraph); eit != eit_end; ++eit) {
+            ProcId targetProcId = target(*eit, m_procTreeGraph);
+            updateProcess( m_procTreeGraph[ targetProcId ].pid );
         }
 
         if(!processExists(pidStr)) {
@@ -136,8 +136,8 @@ namespace keyfrog {
             // Refresh process info
             setProcessProperties(procId);
             // Add connection from new parent
-            pid_t ppid = m_procTree[procId].ppid;
-            add_edge(m_pidToId[ppid], procId, m_procTree);
+            pid_t ppid = m_procTreeGraph[procId].ppid;
+            add_edge(m_pidToIdMap[ppid], procId, m_procTreeGraph);
         }
     }
 
@@ -147,8 +147,8 @@ namespace keyfrog {
     void ProcessManager::removeProcess(ProcId procId) {
         boost::recursive_mutex::scoped_lock lock(m_accessMutex);
 
-        m_pidToId.erase(m_procTree[procId].pid);
-        remove_vertex(procId, m_procTree);
+        m_pidToIdMap.erase(m_procTreeGraph[procId].pid);
+        remove_vertex(procId, m_procTreeGraph);
     }
 
     /**
@@ -163,16 +163,16 @@ namespace keyfrog {
             pid = boost::lexical_cast<int>(pidStr);
 
             // Vertex of given process already exists?
-            if(0 != m_pidToId.count(pid)) {
-                newProc = m_pidToId[pid];
+            if(0 != m_pidToIdMap.count(pid)) {
+                newProc = m_pidToIdMap[pid];
                 return true;
             }
 
             // Add pid to graph
-            newProc = add_vertex(m_procTree);
-            m_procTree[newProc].pid = pid;
-            m_procTree[newProc].pidStr = pidStr;
-            m_pidToId[pid] = newProc;
+            newProc = add_vertex(m_procTreeGraph);
+            m_procTreeGraph[newProc].pid = pid;
+            m_procTreeGraph[newProc].pidStr = pidStr;
+            m_pidToIdMap[pid] = newProc;
         } catch( const std::exception & ex ) {
             // FIXME
             return false;
@@ -203,22 +203,22 @@ namespace keyfrog {
     void ProcessManager::dumpTree(string filename) {
         boost::recursive_mutex::scoped_lock lock(m_accessMutex);
 
-        print_graph(m_procTree, get(&proc::ProcProperties::pid, m_procTree));
+        print_graph(m_procTreeGraph, get(&proc::ProcProperties::pid, m_procTreeGraph));
     }
 
     int ProcessManager::procCount() {
-        return num_vertices(m_procTree);
+        return num_vertices(m_procTreeGraph);
     }
 
     set< pair<pid_t, std::string> > ProcessManager::fetchDescendants(pid_t pid) {
         set< pair<pid_t, string> > retSet;
-        if(0 == m_pidToId.count(pid)) {
+        if(0 == m_pidToIdMap.count(pid)) {
             _dbg("NO SUCH PID %d! ", pid);
             return retSet;
         }
 
         // The pid must exist (see count(key) above)
-        ProcId procId = m_pidToId[pid];
+        ProcId procId = m_pidToIdMap[pid];
         fetchDescendants_sub(retSet, procId);
 
         _qldbg("-----:::: ");
@@ -232,9 +232,9 @@ namespace keyfrog {
 
     void ProcessManager::fetchDescendants_sub( set< pair<pid_t, string> > & procSet, ProcId procId) {
         ProcDescIter eit, eit_end;
-        for(tie(eit, eit_end) = out_edges(procId, m_procTree); eit != eit_end; ++eit) {
-            ProcId subProc = target(*eit, m_procTree);
-            pair<pid_t, string> setEl( m_procTree[subProc].pid, m_procTree[subProc].name );
+        for(tie(eit, eit_end) = out_edges(procId, m_procTreeGraph); eit != eit_end; ++eit) {
+            ProcId subProc = target(*eit, m_procTreeGraph);
+            pair<pid_t, string> setEl( m_procTreeGraph[subProc].pid, m_procTreeGraph[subProc].name );
             procSet.insert(setEl);
             // Now recurse for children of subProc
             fetchDescendants_sub( procSet, subProc );
@@ -243,15 +243,15 @@ namespace keyfrog {
 
     const std::string & ProcessManager::fetchName( pid_t pid ) {
         static const std::string empty_string = "";
-        if(0 == m_pidToId.count(pid)) {
+        if(0 == m_pidToIdMap.count(pid)) {
             _dbg("NO SUCH PID %d! ", pid);
             return empty_string;
         }
 
         // The pid must exist (see count(key) above)
-        ProcId procId = m_pidToId[pid];
+        ProcId procId = m_pidToIdMap[pid];
 
-        return m_procTree[procId].name;
+        return m_procTreeGraph[procId].name;
     }
 }
 

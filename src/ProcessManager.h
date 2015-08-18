@@ -69,10 +69,10 @@ namespace keyfrog {
         protected:
 
             /// Process graph
-            proc::ProcTree m_procTree;
+            proc::ProcTree m_procTreeGraph;
 
             /// Maps pids to vertex indexes
-            std::map<pid_t, proc::ProcId> m_pidToId;
+            std::map<pid_t, proc::ProcId> m_pidToIdMap;
 
             /// Path to proc filesystem
             boost::filesystem::path m_procBase;

@@ -70,8 +70,8 @@ namespace keyfrog {
     void ProcessManagerUnix::createProcTree() {
         boost::recursive_mutex::scoped_lock lock(m_accessMutex);
 
-        m_procTree.clear();
-        m_pidToId.clear();
+        m_procTreeGraph.clear();
+        m_pidToIdMap.clear();
         fs::directory_iterator end_iter;
 
         // Get maps for used vertex properties
@@ -113,31 +113,31 @@ namespace keyfrog {
     bool ProcessManagerUnix::setProcessProperties(const ProcId & newProc) {
         try {
             // Find it's parent
-            if( ! exists( m_procBase / m_procTree[newProc].pidStr / "stat" ) ) {
+            if( ! exists( m_procBase / m_procTreeGraph[newProc].pidStr / "stat" ) ) {
                 throw std::runtime_error("file does not exist");
             }
-            fs::ifstream statFile( m_procBase / m_procTree[newProc].pidStr / "stat" );
+            fs::ifstream statFile( m_procBase / m_procTreeGraph[newProc].pidStr / "stat" );
             string trm;
             statFile >> trm;
             statFile >> trm; // "(procname)"
-            m_procTree[newProc].name = trm.substr(1, trm.size() - 2);
+            m_procTreeGraph[newProc].name = trm.substr(1, trm.size() - 2);
             statFile >> trm;
             statFile >> trm; // parent process pid
-            m_procTree[newProc].ppid = boost::lexical_cast<int>(trm);
-            m_procTree[newProc].ppidStr = trm;
+            m_procTreeGraph[newProc].ppid = boost::lexical_cast<int>(trm);
+            m_procTreeGraph[newProc].ppidStr = trm;
             //_dbg("Parent of %s is: %s", pidStr.c_str(), trm.c_str());
-            //_dbg("Name of %d is %s", m_procTree[newProc].pid, m_procTree[newProc].name.c_str());
+            //_dbg("Name of %d is %s", m_procTreeGraph[newProc].pid, m_procTreeGraph[newProc].name.c_str());
         }
 
         catch( const std::exception & ex ) {
             const char * _procBase = m_procBase.c_str();
-            const char * _pid = m_procTree[newProc].pidStr.c_str();
+            const char * _pid = m_procTreeGraph[newProc].pidStr.c_str();
 
             // Check if it is special pid 0
-            if( 0 == m_procTree[newProc].pid ) {
-                m_procTree[ newProc ].ppid = 0;
-                m_procTree[ newProc ].ppidStr = string("0");
-                m_procTree[ newProc ].name = string("[void process 0]");
+            if( 0 == m_procTreeGraph[newProc].pid ) {
+                m_procTreeGraph[ newProc ].ppid = 0;
+                m_procTreeGraph[ newProc ].ppidStr = string("0");
+                m_procTreeGraph[ newProc ].name = string("[void process 0]");
             } else {
                 _dbg( "%sError accessing process information at %s/%s/stat: %s%s" , cred, _procBase, _pid, ex.what(), creset);
 
