@@ -133,17 +133,24 @@ namespace keyfrog {
             const char * _procBase = m_procBase.c_str();
             const char * _pid = m_procTree[newProc].pidStr.c_str();
 
-            _dbg( "%sError accessing process information at %s/%s/stat: %s%s" , cred, _procBase, _pid, ex.what(), creset);
+            // Check if it is special pid 0
+            if( 0 == m_procTree[newProc].pid ) {
+                m_procTree[ newProc ].ppid = 0;
+                m_procTree[ newProc ].ppidStr = string("0");
+                m_procTree[ newProc ].name = string("[void process 0]");
+            } else {
+                _dbg( "%sError accessing process information at %s/%s/stat: %s%s" , cred, _procBase, _pid, ex.what(), creset);
 
-            if( ! fs::exists( m_procBase ) ) {
-                _dbg( "%sThe proc file system does not exist at %s. It is required by Keyfrog.%s",
-                        cred, _procBase, creset);
-            } else if( ! fs::exists( m_procBase / _pid ) ) {
-                _qdbg( "%sProcess (pid %s) does not exist anymore at %s/%s%s",
-                        cred, _pid, _procBase, _pid, creset);
+                if( ! fs::exists( m_procBase ) ) {
+                    _dbg( "%sThe proc file system does not exist at %s. It is required by Keyfrog.%s",
+                            cred, _procBase, creset);
+                } else if( ! fs::exists( m_procBase / _pid ) ) {
+                    _qdbg( "%sProcess (pid %s) does not exist anymore at %s/%s%s",
+                            cred, _pid, _procBase, _pid, creset);
+                }
+
+                return false;
             }
-
-            return false;
         }
 
         return true;

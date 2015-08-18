@@ -77,11 +77,6 @@ namespace keyfrog {
             return false;
         }
 
-        // Skip process 0 -- it's a special pid, parent of processes that do not have parent
-        if( 0 == m_procTree[newProc].pid ) {
-            return false;
-        }
-
         // Find it's parent
         if(!setProcessProperties(newProc)) {
             _dbg("ERROR: setProcessProperties failed for pid: %s", pidStr.c_str());
@@ -172,13 +167,6 @@ namespace keyfrog {
             m_procTree[newProc].pid = pid;
             m_procTree[newProc].pidStr = pidStr;
             m_pidToId[pid] = newProc;
-
-            // Special pid 0?
-            if( 0 == pid ) {
-                m_procTree[ newProc ].ppid = 0;
-                m_procTree[ newProc ].ppidStr = string("0");
-                m_procTree[ newProc ].name = string("[empty process 0]");
-            }
         } catch( const std::exception & ex ) {
             // FIXME
             return false;
