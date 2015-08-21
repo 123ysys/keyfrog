@@ -2,7 +2,7 @@
 
 Use following command to get CLASS name of an X11 application (i.e. GUI application, not a textual application running in terminal):
 
-$ xprop WM_CLASS | cut -d, -f
+$ xprop WM_CLASS | cut -d, -f 2
 
 -->
 <keyfrog>
