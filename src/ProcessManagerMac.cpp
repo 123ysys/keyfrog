@@ -50,10 +50,11 @@
 
 #include "Debug.h"
 
-using namespace boost;
+#include <libproc.h>
+
 namespace fs = boost::filesystem;
+using namespace boost;
 using namespace std;
-using namespace keyfrog::proc;
 
 typedef struct kinfo_proc kinfo_proc;
 static bool GetUnixProcesses( std::vector< kinfo_proc > & procList );
@@ -77,10 +78,36 @@ namespace keyfrog {
      * Creates initial process tree
      */
     void ProcessManagerMac::createProcTree() {
+        boost::recursive_mutex::scoped_lock lock( m_processTree.mutex() );
+
         std::vector< kinfo_proc > procList;
         GetUnixProcesses( procList );
 
         _dbg("Mac Process count: %u!", procList.size());
+
+        // Later?
+        m_processTree.clear();
+
+        vector< kinfo_proc >::iterator it;
+        vector< kinfo_proc >::iterator end_it = procList.end();
+
+        // Creates a map with all processes that will be feed to m_processTree
+        ProcessMap processMap;
+        for ( it = procList.begin(); it != end_it; ++it ) {
+            try {
+                // Get the instantly available data
+                pid_t pid = it->kp_proc.p_pid;
+                pid_t ppid = it->kp_eproc.e_ppid;
+
+                processMap[ pid ] = ProcessProperties();
+                setProcessProperties( processMap[ pid ], pid, true, ppid, false, "" );
+            } catch ( const std::exception & ex ) {
+                _dbg("Exception while adding processes: %s", ex.what());
+            }
+        }
+
+        m_processTree.addConnectProcesses( processMap );
+        //dumpTree();
     }
 
     /**
@@ -101,7 +128,55 @@ namespace keyfrog {
      *
      * @return success/failure
      */
-    bool ProcessManagerMac::setProcessProperties(const ProcId & newProc) {
+    bool ProcessManagerMac::setProcessProperties(ProcessProperties & newProperties, pid_t pid,
+                                                    bool ppid_known, pid_t ppid,
+                                                    bool name_known, const std::string & name
+                                                ) {
+        newProperties.pid = pid;
+        try {
+            newProperties.pidStr = boost::lexical_cast< string >( pid );
+        } catch( const std::exception & ex ) {
+            return false;
+        }
+
+        if( !ppid_known ) {
+            // TODO unimplemented
+            newProperties.ppid_known = false;
+            return false;
+        } else {
+            newProperties.ppid = ppid;
+            try {
+                newProperties.ppidStr = boost::lexical_cast< string >( ppid );
+            } catch( const std::exception & ex ) {
+                return false;
+            }
+            newProperties.ppid_known = true;
+        }
+
+        if( !name_known ) {
+            char pathbuf[2048];
+
+            int ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+            if ( ret <= 0 ) {
+                _ldbg("Error while retrieveing executable path (proc_pidpath()) for PID %d: ", pid);
+                _dbg("   %s\n", strerror(errno));
+                return false;
+            }
+
+            string filename(pathbuf);
+            const size_t last_slash_idx = filename.find_last_of("/");
+            if (std::string::npos != last_slash_idx) {
+                filename.erase(0, last_slash_idx + 1);
+            }
+
+            newProperties.name = filename;
+            newProperties.name_known = true;
+        } else {
+            newProperties.name = name;
+            newProperties.name_known = true;
+        }
+
+        //_dbg( "Path of %d is: %s", pid, pathbuf );
         return true;
     }
 

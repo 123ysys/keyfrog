@@ -71,7 +71,7 @@ namespace keyfrog {
         // Inotify doesn't detect events on /proc. Is there other way? 
         // Workaround: process tree is recreated every 5 seconds (TODO: config option for this)
         while ( 1 ) {
-            _dbg("%s//// procMonitor loop (|V|=%d) ////%s", cboldGreen, m_procMan->procCount(), creset);
+            _dbg("%s//// procMonitor loop (|V|=%d) ////%s", cboldGreen, m_procMan->processTree().count(), creset);
             m_procMan->createProcTree();
 
             // Wait a bit..

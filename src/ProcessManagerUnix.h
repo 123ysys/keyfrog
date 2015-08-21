@@ -45,7 +45,9 @@ namespace keyfrog {
         protected:
 
             /// Sets parent, name, etc. parameters 
-            virtual bool setProcessProperties(const proc::ProcId & newProc);
+            virtual bool setProcessProperties(ProcessProperties & newProcProp, pid_t pid,
+                                            bool ppid_known, pid_t ppid,
+                                            bool name_known, const std::string & name);
 
         public:
 

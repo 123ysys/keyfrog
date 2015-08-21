@@ -45,7 +45,6 @@
 
 namespace fs = boost::filesystem;
 using namespace std;
-using namespace keyfrog::proc;
 using namespace keyfrog::TermCodes;
 
 // FIXME: what about processes that cant be read (/proc/{pid} permissions)
@@ -70,21 +69,31 @@ namespace keyfrog {
     void ProcessManagerUnix::createProcTree() {
         boost::recursive_mutex::scoped_lock lock(m_accessMutex);
 
-        m_procTreeGraph.clear();
-        m_pidToIdMap.clear();
         fs::directory_iterator end_iter;
 
-        // Get maps for used vertex properties
-        for ( fs::directory_iterator dir_itr(m_procBase); dir_itr != end_iter; ++dir_itr ) {
-            try {
+        // Creates a map with all processes that will be feed to m_processTree
+        ProcessMap processMap;
+        try {
+            for ( fs::directory_iterator dir_itr(m_procBase); dir_itr != end_iter; ++dir_itr ) {
                 if ( fs::is_directory( *dir_itr ) ) {
-                    // leaf() is removed
-                    addConnectProcess(dir_itr->path().filename().string());
+                    pid_t pid;
+                    try {
+                        pid = boost::lexical_cast< pid_t >( dir_itr->path().filename().string() );
+                    } catch( const std::exception & ex ) {
+                        //_dbg("Exception while enumerating processes [1]: %s", ex.what());
+                        continue;
+                    }
+                    processMap[ pid ] = ProcessProperties();
+                    setProcessProperties( processMap[ pid ], pid, false, 0, false, "" );
                 }
-            } catch ( const std::exception & ex ) {
-                _dbg("Exception while enumerating processes: %s", ex.what());
             }
+        } catch ( const std::exception & ex ) {
+            _dbg("Exception while enumerating processes [2]: %s", ex.what());
         }
+
+        boost::recursive_mutex::scoped_lock lock2( m_processTree.mutex() );
+        m_processTree.clear();
+        m_processTree.addConnectProcesses( processMap );
         //dumpTree();
     }
 
@@ -110,36 +119,61 @@ namespace keyfrog {
      *
      * @return success/failure
      */
-    bool ProcessManagerUnix::setProcessProperties(const ProcId & newProc) {
+    bool ProcessManagerUnix::setProcessProperties(ProcessProperties & newProcProp, pid_t pid,
+                                            bool ppid_known, pid_t ppid,
+                                            bool name_known, const std::string & name
+                                        ) {
         try {
+            newProcProp.pid = pid;
+            newProcProp.pidStr = boost::lexical_cast<string>(pid);
+
             // Find it's parent
-            if( ! exists( m_procBase / m_procTreeGraph[newProc].pidStr / "stat" ) ) {
+            if( ! exists( m_procBase / newProcProp.pidStr / "stat" ) ) {
                 throw std::runtime_error("file does not exist");
             }
-            fs::ifstream statFile( m_procBase / m_procTreeGraph[newProc].pidStr / "stat" );
+            fs::ifstream statFile( m_procBase / newProcProp.pidStr / "stat" );
+
             string trm;
             statFile >> trm;
             statFile >> trm; // "(procname)"
-            m_procTreeGraph[newProc].name = trm.substr(1, trm.size() - 2);
+
+            if( !name_known ) {
+                newProcProp.name = trm.substr(1, trm.size() - 2);
+            } else {
+                newProcProp.name = name;
+            }
+            newProcProp.name_known = true;
+
             statFile >> trm;
-            statFile >> trm; // parent process pid
-            m_procTreeGraph[newProc].ppid = boost::lexical_cast<int>(trm);
-            m_procTreeGraph[newProc].ppidStr = trm;
+
+            // Is ppid and ppidStr already set?
+            if( !ppid_known ) {
+                statFile >> trm; // parent process pid
+                pid_t ppid2 = boost::lexical_cast<int>(trm);
+                newProcProp.ppidStr = trm;
+                newProcProp.ppid = ppid2;
+            } else {
+                newProcProp.ppidStr = boost::lexical_cast<string>(ppid);
+                newProcProp.ppid = ppid;
+            }
+            newProcProp.ppid_known = true;
+
             //_dbg("Parent of %s is: %s", pidStr.c_str(), trm.c_str());
             //_dbg("Name of %d is %s", m_procTreeGraph[newProc].pid, m_procTreeGraph[newProc].name.c_str());
         }
 
         catch( const std::exception & ex ) {
             const char * _procBase = m_procBase.c_str();
-            const char * _pid = m_procTreeGraph[newProc].pidStr.c_str();
+            const char * _pid = newProcProp.pidStr.c_str();
 
             // Check if it is special pid 0
-            if( 0 == m_procTreeGraph[newProc].pid ) {
-                m_procTreeGraph[ newProc ].ppid = 0;
-                m_procTreeGraph[ newProc ].ppidStr = string("0");
-                m_procTreeGraph[ newProc ].name = string("[void process 0]");
+            if( 0 == newProcProp.pid ) {
+                newProcProp.ppid = 0;
+                newProcProp.ppidStr = string("0");
+                newProcProp.name = string("[void process 0]");
             } else {
-                _dbg( "%sError accessing process information at %s/%s/stat: %s%s" , cred, _procBase, _pid, ex.what(), creset);
+                _dbg( "%sError adding new process. Was accessing information at %s/%s/stat: %s%s",
+                        cred, _procBase, _pid, ex.what(), creset);
 
                 if( ! fs::exists( m_procBase ) ) {
                     _dbg( "%sThe proc file system does not exist at %s. It is required by Keyfrog.%s",

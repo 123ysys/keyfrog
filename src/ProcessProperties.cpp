@@ -27,37 +27,11 @@
  *   SUCH DAMAGE.                                                                *
  *********************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #include <config.h>
 #endif
-
-#include "ProcessManager.h"
-
-#include "Debug.h"
-
-// For reading /proc
-
-
-namespace fs = boost::filesystem;
-using namespace std;
-
-// FIXME: what about processes that cant be read (/proc/{pid} permissions)
+#include "ProcessProperties.h"
 
 namespace keyfrog {
 
-    /**
-     * Public constructor 
-     */
-    ProcessManager::ProcessManager() : m_procBase( "/proc" ) {
-    }
-
-    /**
-     * Public destructor
-     */
-    ProcessManager::~ProcessManager() {
-    }
-
-
 }
-
-// vim:et:sw=4:ts=4:sts=4

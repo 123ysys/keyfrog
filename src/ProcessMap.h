@@ -27,37 +27,23 @@
  *   SUCH DAMAGE.                                                                *
  *********************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#ifndef PROCESSMAP_H
+#define PROCESSMAP_H
 
-#include "ProcessManager.h"
+#include <string>
+#include <map>
+#include <set>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include "Debug.h"
-
-// For reading /proc
-
-
-namespace fs = boost::filesystem;
-using namespace std;
-
-// FIXME: what about processes that cant be read (/proc/{pid} permissions)
+#include "ProcessProperties.h"
 
 namespace keyfrog {
 
     /**
-     * Public constructor 
-     */
-    ProcessManager::ProcessManager() : m_procBase( "/proc" ) {
-    }
-
-    /**
-     * Public destructor
-     */
-    ProcessManager::~ProcessManager() {
-    }
-
-
+      @author Sebastian Gniazdowski
+      */
+    typedef std::map< pid_t, ProcessProperties > ProcessMap;
 }
 
-// vim:et:sw=4:ts=4:sts=4
+#endif

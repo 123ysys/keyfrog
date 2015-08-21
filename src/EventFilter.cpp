@@ -222,7 +222,7 @@ namespace keyfrog {
         const list<Group> & groups = m_filterConfig.groups();
 
         // Fetch the set of descendant processes
-        set< pair<pid_t, string> > dprocs = m_pm.fetchDescendants(pid);
+        set< pair<pid_t, string> > dprocs = m_pm.processTree().fetchDescendants(pid);
 
         // Walk through ALL groups (and then iterate over proc names, which may not exist)
         bool matched = false;
@@ -257,7 +257,7 @@ namespace keyfrog {
     int EventFilter::matchProc(pid_t pid) {
         int gid = -1;
         const list<Group> & groups = m_filterConfig.groups();
-        const std::string & procName = m_pm.fetchName( pid );
+        const std::string & procName = m_pm.processTree().fetchName( pid );
 
         // Walk through ALL groups (and then iterate over proc names, which may not exist)
         bool matched = false;
