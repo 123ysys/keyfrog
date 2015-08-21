@@ -267,7 +267,7 @@ namespace keyfrog {
             // Iterate through proc names
             for ( list<string>::const_iterator pit = procs.begin(); pit != procs.end(); ++pit ) {
                 // Compare proc names in group with proc name of given pid
-                _ldbg( "ProcCompare %s == %s", pit->c_str(), procName.c_str() );
+                _dbg( "ProcCompare %s == %s", pit->c_str(), procName.c_str() );
                 if( string_eq_ci( (*pit), procName ) ) {
                     matched = true;
                     gid = grp->id();
