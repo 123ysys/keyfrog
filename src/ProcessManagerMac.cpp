@@ -78,15 +78,12 @@ namespace keyfrog {
      * Creates initial process tree
      */
     void ProcessManagerMac::createProcTree() {
-        boost::recursive_mutex::scoped_lock lock( m_processTree.mutex() );
+        boost::recursive_mutex::scoped_lock lock( m_accessMutex );
 
         std::vector< kinfo_proc > procList;
         GetUnixProcesses( procList );
 
         _dbg("Mac Process count: %u!", procList.size());
-
-        // Later?
-        m_processTree.clear();
 
         vector< kinfo_proc >::iterator it;
         vector< kinfo_proc >::iterator end_it = procList.end();
@@ -106,7 +103,10 @@ namespace keyfrog {
             }
         }
 
+        boost::recursive_mutex::scoped_lock lock2( m_processTree.mutex() );
+        m_processTree.clear();
         m_processTree.addConnectProcesses( processMap );
+
         //dumpTree();
     }
 
