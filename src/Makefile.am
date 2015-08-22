@@ -1,10 +1,10 @@
 bin_PROGRAMS = keyfrog
-keyfrog_SOURCES = keyfrog.cpp EventMonitorX11.cpp EventMonitorMac.cpp CallbackClosure.cpp \
-					ConfigReader.cpp Event.cpp EventFilter.cpp FilterConfig.cpp Group.cpp RawEvent.cpp \
-					Regex.cpp Storage.cpp Configuration.cpp Daemon.cpp WindowInformationManager.cpp \
-					WindowInformation.cpp TermCode.cpp XErrorUtil.cpp StorageSqlite.cpp Debug.cpp Options.cpp \
-					StorageManager.cpp ProcessManager.cpp ProcessManagerMac.cpp ProcessManagerUnix.cpp \
-					ProcessMonitor.cpp Common.cpp ProcessMap.cpp ProcessProperties.cpp ProcessTree.cpp
+keyfrog_SOURCES = keyfrog.cpp CallbackClosure.cpp ConfigReader.cpp Configuration.cpp Daemon.cpp Debug.cpp \
+    EventFilter.cpp Event.cpp EventMonitorX11.cpp EventMonitorMac.cpp FilterConfig.cpp \
+    Group.cpp Options.cpp ProcessManager.cpp ProcessManagerMac.cpp ProcessManagerUnix.cpp \
+    ProcessMonitor.cpp RawEvent.cpp Regex.cpp Storage.cpp StorageManager.cpp StorageSqlite.cpp \
+    TermCode.cpp  WindowInformation.cpp WindowInformationManager.cpp XErrorUtil.cpp \
+    Common.cpp ProcessTree.cpp ProcessProperties.cpp ProcessMap.cpp
 
 # libxml2 is hardcoded because of problems with ubuntu
 
