@@ -43,10 +43,6 @@
 
 #include <exception>
 #include <boost/lexical_cast.hpp>
-// For reading /proc
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/graph/graph_utility.hpp>
 
 #include "Debug.h"
 
