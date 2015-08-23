@@ -32,8 +32,8 @@ src/ProcessManager.cpp
 src/ProcessManager.h
 src/ProcessManagerMac.cpp
 src/ProcessManagerMac.h
-src/ProcessManagerUnix.cpp
-src/ProcessManagerUnix.h
+src/ProcessManagerLinux.cpp
+src/ProcessManagerLinux.h
 src/ProcessMap.cpp
 src/ProcessMap.h
 src/ProcessMonitor.cpp
@@ -60,3 +60,5 @@ src/WindowInformationManager.cpp
 src/WindowInformationManager.h
 src/XErrorUtil.cpp
 src/XErrorUtil.h
+src/ProcessManagerFBSD.h
+src/ProcessManagerFBSD.cpp

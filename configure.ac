@@ -18,12 +18,51 @@ case x"$host_os" in
               [Defined if host is OSX])
         CARBON_FRAMEWORK="-Wl,-framework,Carbon"
         AC_SUBST([CARBON_FRAMEWORK])
+    host_is_osx="yes"
+    ;;
+  *linux*)
+    AC_DEFINE([HOST_IS_LINUX],[],
+              [Defined if host is Linux])
+    host_is_linux="yes"
+    ;;
+  *freebsd*)
+    AC_DEFINE([HOST_IS_FBSD],[],
+              [Defined if host is FreeBSD])
+    host_is_freebsd="yes"
     ;;
   *)
     AC_DEFINE([HOST_IS_OTHER_UNIX],[],
-              [Defined if host is a general Unix-like system])
+              [Defined if host is an undetermined Unix-like system])
+    host_is_other_unix="yes"
     ;;
 esac
+
+#
+# libutil
+#
+
+if test "x$host_is_freebsd" = "xyes" ; then
+    AC_CHECK_LIB([util], [kinfo_getallproc],
+                [LIBUTIL_LIBS=-lutil],
+                [LIBUTIL_LIBS=])
+
+    if test "x$LIBUTIL_LIBS" = "x"; then
+        AC_MSG_ERROR([Could not find libutil (searched for library file)])
+    fi
+
+    # Are system include dirs sufficient?
+    AC_TRY_COMPILE([#include <libutil.h>], [int a = 1;],
+        [LIBUTIL_CFLAGS=" "],
+        [LIBUTIL_CFLAGS=]
+    )
+
+    if test "x$LIBUTIL_CFLAGS" = "x"; then
+        AC_MSG_ERROR([Could not find libutil (searched for the header file, i.e. libutil.h)])
+    fi
+fi
+
+AC_SUBST([LIBUTIL_CFLAGS])
+AC_SUBST([LIBUTIL_LIBS])
 
 #
 # Boost
@@ -287,8 +326,8 @@ fi
 AM_CONDITIONAL([COND_KEYVIS], [test "x$want_keyvis" = "xyes"])
 
 # BOOST_CPPFLAGS can have non preprocessor options like -pthread
-add_LDFLAGS="$X11_LIBS $XTST_LIBS $LIBXML2_LIBS $SQLITE3_LIBS $BOOST_LDFLAGS $BOOST_SYSTEM_LIB $BOOST_THREAD_LIB $BOOST_FILESYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $CARBON_FRAMEWORK"
-add_CXXFLAGS="$X11_CFLAGS $XTST_CFLAGS $LIBXML2_CFLAGS $SQLITE3_CFLAGS $BOOST_CPPFLAGS"
+add_LDFLAGS="$X11_LIBS $XTST_LIBS $LIBUTIL_LIBS $LIBXML2_LIBS $SQLITE3_LIBS $BOOST_LDFLAGS $BOOST_SYSTEM_LIB $BOOST_THREAD_LIB $BOOST_FILESYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $CARBON_FRAMEWORK"
+add_CXXFLAGS="$X11_CFLAGS $XTST_CFLAGS $LIBUTIL_CFLAGS $LIBXML2_CFLAGS $SQLITE3_CFLAGS $BOOST_CPPFLAGS"
 
 AC_CONFIG_FILES(Makefile src/Makefile doc/Makefile)
 AC_OUTPUT

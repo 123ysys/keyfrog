@@ -27,32 +27,36 @@
  *   SUCH DAMAGE.                                                                *
  *********************************************************************************/
 
-/* A fallback, for some weird situations */
-#warning HOST DETECTION FALLBACK ACTIVATED
+#ifndef KEYFROG_PROCESSMANAGERFBSD_H
+#define KEYFROG_PROCESSMANAGERFBSD_H
 
-/* Consistency check, only one combination though */
-#ifdef HOST_IS_OSX
-        #ifdef HOST_IS_OTHER_UNIX
-                #undef HOST_IS_OSX
-                #undef HOST_IS_LINUX
-                #undef HOST_IS_FBSD
-                #undef HOST_IS_OTHER_UNIX
-        #endif
-#endif
+#include "ProcessManager.h"
 
-/* The fallback */
-#ifndef HOST_IS_OSX
-        #ifndef HOST_IS_OTHER_UNIX
-            #ifndef HOST_IS_FBSD
-                #ifdef __APPLE__
-                        #define HOST_IS_OSX 1
-                #elif defined __FREEBSD__
-                        #define HOST_IS_FBSD 1
-                #else defined __linux__
-                        #define HOST_IS_LINUX 1
-                #else
-                        #define HOST_IS_OTHER_UNIX 1
-                #endif
-        #endif
-#endif
+namespace keyfrog {
 
+    class ProcessManagerFBSD : public ProcessManager
+    {
+        /// Sets parent, name, etc. parameters
+        virtual bool setProcessProperties(ProcessProperties & newProcProp, pid_t pid,
+                bool ppid_known, pid_t ppid,
+                bool name_known, const std::string & name
+                );
+
+        public:
+
+        /// Public constructor
+        ProcessManagerFBSD();
+
+        /// Public destructor
+        virtual ~ProcessManagerFBSD();
+
+        /// Creates complete, initial process tree
+        virtual void createProcTree();
+
+        /// Checks if process exists
+        virtual bool processExists(const std::string & pidStr);
+    };
+
+}
+
+#endif // KEYFROG_PROCESSMANAGERFBSD_H

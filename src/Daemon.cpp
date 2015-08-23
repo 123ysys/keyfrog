@@ -40,8 +40,9 @@
 #include <boost/bind.hpp>
 
 #include "Daemon.h"
-#include "ProcessManagerUnix.h"
+#include "ProcessManagerLinux.h"
 #include "ProcessManagerMac.h"
+#include "ProcessManagerFBSD.h"
 #include "RawEvent.h"
 #include "CallbackClosure.h"
 #include "Configuration.h"
@@ -86,8 +87,10 @@ namespace keyfrog {
     Daemon::Daemon(bool asDaemon) : m_xConnected(false) {
 #ifdef HOST_IS_OSX
         m_processManager = new ProcessManagerMac();
-#else
-        m_processManager = new ProcessManagerUnix();
+#elif defined HOST_IS_LINUX
+        m_processManager = new ProcessManagerLinux();
+#elif defined HOST_IS_FBSD
+        m_processManager = new ProcessManagerFBSD();
 #endif
         m_eventFilter = new EventFilter( m_wim, *m_processManager );
         m_processMonitor = new ProcessMonitor();

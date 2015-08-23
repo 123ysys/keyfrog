@@ -27,8 +27,8 @@
  *   SUCH DAMAGE.                                                                *
  *********************************************************************************/
 
-#ifndef KEYFROG_PROCESSMANAGERUNIX_H
-#define KEYFROG_PROCESSMANAGERUNIX_H
+#ifndef KEYFROG_PROCESSMANAGERLINUX_H
+#define KEYFROG_PROCESSMANAGERLINUX_H
 
 #include "ProcessManager.h"
 
@@ -41,7 +41,7 @@ namespace keyfrog {
      * - createProcTree()
      * - processExists()
      */
-    class ProcessManagerUnix : public ProcessManager {      
+    class ProcessManagerLinux : public ProcessManager {      
         protected:
 
             /// Sets parent, name, etc. parameters 
@@ -52,10 +52,10 @@ namespace keyfrog {
         public:
 
             /// Public constructor
-            ProcessManagerUnix();
+            ProcessManagerLinux();
 
             /// Public destructor
-            virtual ~ProcessManagerUnix();
+            virtual ~ProcessManagerLinux();
 
             /// Creates complete, initial process tree
             virtual void createProcTree();

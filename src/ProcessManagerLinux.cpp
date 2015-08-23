@@ -27,11 +27,15 @@
  *   SUCH DAMAGE.                                                                *
  *********************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H       /* HAVE_CONFIG_H */
 #include <config.h>
-#endif
+#else                           /* HAVE_CONFIG_H */
+#include <FallbackConfigH.h>
+#endif                          /* HAVE_CONFIG_H */
 
-#include "ProcessManagerUnix.h"
+#ifdef HOST_IS_LINUX
+
+#include "ProcessManagerLinux.h"
 
 #include "Debug.h"
 #include "TermCode.h"
@@ -52,21 +56,21 @@ using namespace keyfrog::TermCodes;
 namespace keyfrog {
 
     /**
-     * Constructor 
+     * Constructor
      */
-    ProcessManagerUnix::ProcessManagerUnix() {
+    ProcessManagerLinux::ProcessManagerLinux() {
     }
 
     /**
      * Destructor
      */
-    ProcessManagerUnix::~ProcessManagerUnix() {
+    ProcessManagerLinux::~ProcessManagerLinux() {
     }
 
     /**
      * Creates initial process tree
      */
-    void ProcessManagerUnix::createProcTree() {
+    void ProcessManagerLinux::createProcTree() {
         boost::recursive_mutex::scoped_lock lock(m_accessMutex);
 
         fs::directory_iterator end_iter;
@@ -102,7 +106,7 @@ namespace keyfrog {
      *
      * Not thread safe (not needed)
      */
-    bool ProcessManagerUnix::processExists(const string & pidStr) {
+    bool ProcessManagerLinux::processExists(const string & pidStr) {
         fs::path proc_path( m_procBase / pidStr );
 
         // Check if process exists and is directory
@@ -119,7 +123,7 @@ namespace keyfrog {
      *
      * @return success/failure
      */
-    bool ProcessManagerUnix::setProcessProperties(ProcessProperties & newProcProp, pid_t pid,
+    bool ProcessManagerLinux::setProcessProperties(ProcessProperties & newProcProp, pid_t pid,
                                             bool ppid_known, pid_t ppid,
                                             bool name_known, const std::string & name
                                         ) {
@@ -190,3 +194,5 @@ namespace keyfrog {
         return true;
     }
 }
+
+#endif /* HOST_IS_LINUX */
