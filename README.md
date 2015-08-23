@@ -41,8 +41,8 @@ Look at doc/sample-config. You probably want to copy it to ~/.keyfrog/config.
 It's easy to edit.
 
 Keyfrog collects keyboard usage statistics into ~/.keyfrog/keyfrog.db
-database (SQLite). From there, separate GUI application "Keyvis" does
-computations and presents visualization.
+database (SQLite). From there, separate GUI application "Keyvis"
+presents visualization.
 
 
 ### 2. Visualization - KEYVIS
