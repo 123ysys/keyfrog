@@ -34,7 +34,8 @@ from sf.net.
 
 Try running in foreground (keyfrog --nb, also look at --help) -- observing
 keyfrog debug output makes it easy to tune configuration (~/.keyfrog/config).
-When run in background, output is being redirected to /tmp/keyfrog.log.
+The output is also saved to ~/.keyfrog/keyfrog.log (unless the configure
+option --disable-debug is used).
 
 Look at doc/sample-config. You probably want to copy it to ~/.keyfrog/config.
 It's easy to edit.
