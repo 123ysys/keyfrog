@@ -202,14 +202,21 @@ namespace keyfrog {
         for(list<Group>::iterator grp = groups.begin(); grp != groups.end(); ++grp) {
             const list<string> & wndClasses = grp->windowClasses();
             // Walk through windowClasses
+            if( wndClasses.size() > 0 ) {
+                _ldbg("Window Class Compare");
+            }
             for ( list<string>::const_iterator clp = wndClasses.begin(); clp != wndClasses.end(); ++clp ) {
                 // Case insensitive compare
+                _qldbg(" %s == %s,", clp->c_str(), className.c_str());
                 if( string_eq_ci( (*clp), className ) ) {
                     matched = true;
                     // Set matched group
                     gid = grp->id();
                     break;
                 }
+            }
+            if( wndClasses.size() > 0 ) {
+                _qdbg("");
             }
             if(matched)
                 break;
