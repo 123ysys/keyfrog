@@ -27,16 +27,29 @@
  *   SUCH DAMAGE.                                                                *
  *********************************************************************************/
 
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif
+#ifndef KEYFROGKFWINDOW_H
+#define KEYFROGKFWINDOW_H
 
-#include "WindowInformation.h"
+#include <string>
+#include <sys/types.h>
 
 namespace keyfrog {
-    WindowInformation::WindowInformation() : m_classNameOk(false), m_clientPidOk(false) {
-    }
 
-    WindowInformation::~WindowInformation() {
-    }
+    /**
+     * @author Sebastian Gniazdowski <srnt at users dot sf dot net>
+     */
+    class KfWindow {
+        friend class KfWindowCache;
+
+        std::string m_className;
+        bool m_classNameOk;
+        pid_t m_clientPid;
+        bool m_clientPidOk;
+
+
+        public:
+        KfWindow();
+        ~KfWindow();
+    };
 }
+#endif

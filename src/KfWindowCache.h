@@ -27,23 +27,23 @@
  *   SUCH DAMAGE.                                                                *
  *********************************************************************************/
 
-#ifndef KEYFROGWINDOWINFORMATIONMANAGER_H
-#define KEYFROGWINDOWINFORMATIONMANAGER_H
+#ifndef KEYFROGKFWINDOWCACHE_H
+#define KEYFROGKFWINDOWCACHE_H
 
-#include "WindowInformation.h"
+#include "KfWindow.h"
 #include <map>
 #include <sys/types.h>
 #include <X11/Xlib.h>
 
 namespace keyfrog {
 
-    typedef std::map<Window, WindowInformation> X11WindowInfoCache;
-    typedef std::map<Window, WindowInformation>::iterator X11WindowInfoCache_it;
+    typedef std::map<Window, KfWindow> X11WindowInfoCache;
+    typedef std::map<Window, KfWindow>::iterator X11WindowInfoCache_it;
 
     /**
      * @author Sebastian Gniazdowski
      */
-    class WindowInformationManager {
+    class KfWindowCache {
         Display *m_display;
         /// Each window has it's information structure
         X11WindowInfoCache m_cache;
@@ -53,11 +53,11 @@ namespace keyfrog {
         bool getWindowParent(Window & winId, Window & root);
 
         public:
-        WindowInformationManager();
+        KfWindowCache();
 
-        WindowInformationManager(Display *display);
+        KfWindowCache(Display *display);
 
-        ~WindowInformationManager();
+        ~KfWindowCache();
 
         bool findAndUseWindow(Window window);
 

@@ -55,7 +55,7 @@ namespace keyfrog {
      *
      * @param wim Window cache, as reference
      */
-    EventFilter::EventFilter(WindowInformationManager & wim, ProcessManager & pm) : m_wim(wim), m_pm(pm) {
+    EventFilter::EventFilter(KfWindowCache & wim, ProcessManager & pm) : m_wim(wim), m_pm(pm) {
         m_wim.setDisplay(m_eventMonitor.ctrlDisplay());
     }
 

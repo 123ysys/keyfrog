@@ -35,7 +35,7 @@
 #include "EventMonitorX11.h"
 #include "FilterConfig.h"
 #include "Event.h"
-#include "WindowInformationManager.h"
+#include "KfWindowCache.h"
 
 #include <list>
 
@@ -45,7 +45,7 @@ namespace keyfrog {
       */
     class EventFilter {
         /// Window properties cache - created outside
-        WindowInformationManager & m_wim;
+        KfWindowCache & m_wim;
         /// Process information cache - created outside
         ProcessManager & m_pm;
         /// Configuration according to EventFilter processes events
@@ -56,7 +56,7 @@ namespace keyfrog {
         EventMonitorX11 m_eventMonitor;
 
         public:
-        EventFilter(WindowInformationManager & wim, ProcessManager & pm);
+        EventFilter(KfWindowCache & wim, ProcessManager & pm);
 
         ~EventFilter();
 

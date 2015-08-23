@@ -3,7 +3,7 @@ keyfrog_SOURCES = keyfrog.cpp CallbackClosure.cpp ConfigReader.cpp Configuration
     EventFilter.cpp Event.cpp EventMonitorX11.cpp EventMonitorMac.cpp FilterConfig.cpp \
     Group.cpp Options.cpp ProcessManager.cpp ProcessManagerMac.cpp ProcessManagerLinux.cpp ProcessManagerFBSD.cpp \
     ProcessMonitor.cpp RawEvent.cpp Regex.cpp Storage.cpp StorageManager.cpp StorageSqlite.cpp \
-    TermCode.cpp  WindowInformation.cpp WindowInformationManager.cpp XErrorUtil.cpp \
+    TermCode.cpp KfWindow.cpp KfWindowCache.cpp XErrorUtil.cpp \
     Common.cpp ProcessTree.cpp ProcessProperties.cpp ProcessMap.cpp
 
 # libxml2 is hardcoded because of problems with ubuntu
@@ -20,6 +20,6 @@ noinst_HEADERS = CallbackClosure.h ConfigReader.h Configuration.h Daemon.h Debug
 		EventFilter.h Event.h EventInternal.h EventMonitor.h EventMonitorX11.h EventMonitorMac.h FilterConfig.h \
 		Group.h Options.h ProcessManager.h ProcessManagerMac.h ProcessManagerLinux.h ProcessManagerFBSD.h \
 		ProcessMonitor.h RawEvent.h Regex.h Storage.h StorageManager.h StorageSqlite.h \
-		TermCode.h  WindowInformation.h WindowInformationManager.h XErrorUtil.h \
+		TermCode.h  KfWindow.h KfWindowCache.h XErrorUtil.h \
 		Common.h ProcessTree.h ProcessProperties.h ProcessMap.h
 

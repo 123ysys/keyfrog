@@ -32,7 +32,7 @@
 #endif
 
 #include <cstring>
-#include "WindowInformationManager.h"
+#include "KfWindowCache.h"
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include "TermCode.h"
@@ -42,16 +42,16 @@ using namespace std;
 using namespace keyfrog::TermCodes;
 
 namespace keyfrog {
-    WindowInformationManager::WindowInformationManager() : m_display(NULL) {
-        _dbg("WindowInformationManager constructor: no display given");
+    KfWindowCache::KfWindowCache() : m_display(NULL) {
+        _dbg("KfWindowCache constructor: no display given");
 
     }
 
-    WindowInformationManager::WindowInformationManager(Display *display) : m_display(display) {
-        _dbg("WindowInformationManager constructor: with display");
+    KfWindowCache::KfWindowCache(Display *display) : m_display(display) {
+        _dbg("KfWindowCache constructor: with display");
     }
 
-    WindowInformationManager::~WindowInformationManager() {
+    KfWindowCache::~KfWindowCache() {
     }
 
     /**
@@ -59,24 +59,24 @@ namespace keyfrog {
      *
      * return Was given window successfully found (always successful?)
      */
-    bool WindowInformationManager::findAndUseWindow(Window window) {
+    bool KfWindowCache::findAndUseWindow(Window window) {
         X11WindowInfoCache_it tmpIterator = m_cache.find(window);
         // No such window in cache?
         if( m_cache.end() == tmpIterator ) {
             // Add it
-            m_cache[window] = WindowInformation();
+            m_cache[window] = KfWindow();
             tmpIterator = m_cache.find(window);
         }
         m_currentCacheEntry = tmpIterator;
         return true;
     }
 
-    const std::string & WindowInformationManager::fetchClassName() {
+    const std::string & KfWindowCache::fetchClassName() {
         static const std::string empty_string = "";
         if( m_cache.end() == m_currentCacheEntry )
             return empty_string;
 
-        WindowInformation & winInfo = m_currentCacheEntry->second;
+        KfWindow & winInfo = m_currentCacheEntry->second;
 
         // WM_CLASS already fetched and valid?
         if(winInfo.m_classNameOk)
@@ -90,11 +90,11 @@ namespace keyfrog {
         return winInfo.m_className;
     }
 
-    pid_t WindowInformationManager::fetchClientPid() {
+    pid_t KfWindowCache::fetchClientPid() {
         if( m_cache.end() == m_currentCacheEntry )
             return 0;
 
-        WindowInformation & winInfo = m_currentCacheEntry->second;
+        KfWindow & winInfo = m_currentCacheEntry->second;
         // PID in cache?
         if(winInfo.m_clientPidOk)
             return winInfo.m_clientPid;
@@ -120,7 +120,7 @@ namespace keyfrog {
      *
      * @return Class name or empty string if not found 
      */
-    string WindowInformationManager::resolveClassName(Window winId) {
+    string KfWindowCache::resolveClassName(Window winId) {
         XClassHint hint;
         std::string className = "";
         Window root;
@@ -157,7 +157,7 @@ namespace keyfrog {
         return className;
     }
 
-    pid_t WindowInformationManager::resolveClientPid(Window winId) {
+    pid_t KfWindowCache::resolveClientPid(Window winId) {
         // Bunch of vars for XGetWindowProperty
         Atom actualType;
         int actualFormat;
@@ -196,7 +196,7 @@ namespace keyfrog {
         return pid;
     }
 
-    bool WindowInformationManager::getWindowParent(Window & winId, Window & _root) {
+    bool KfWindowCache::getWindowParent(Window & winId, Window & _root) {
         Window root, parent, *children = NULL;
         unsigned int num_children;
 
@@ -211,7 +211,7 @@ namespace keyfrog {
         return true;
     }
 
-    void WindowInformationManager::invalidateEntry() {
+    void KfWindowCache::invalidateEntry() {
         if( m_cache.end() != m_currentCacheEntry ) {
             _dbg("INVALIDATE: 0x%x", m_currentCacheEntry->first);
             m_cache.erase(m_currentCacheEntry);

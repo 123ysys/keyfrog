@@ -54,7 +54,7 @@ namespace keyfrog {
         /// Creates FilterConfig etc.
         ConfigReader m_configReader;
         /// Window properties cache
-        WindowInformationManager m_wim;
+        KfWindowCache m_wim;
         /// Daemon configuration
         Configuration m_configuration;
         /// Process manager

@@ -54,10 +54,10 @@ src/StorageSqlite.cpp
 src/StorageSqlite.h
 src/TermCode.cpp
 src/TermCode.h
-src/WindowInformation.cpp
-src/WindowInformation.h
-src/WindowInformationManager.cpp
-src/WindowInformationManager.h
+src/KfWindow.cpp
+src/KfWindow.h
+src/KfWindowCache.cpp
+src/KfWindowCache.h
 src/XErrorUtil.cpp
 src/XErrorUtil.h
 src/ProcessManagerFBSD.h
